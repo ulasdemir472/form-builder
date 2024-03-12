@@ -4,10 +4,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "./components/dialog";
 import { useFormik } from "formik";
@@ -15,7 +12,9 @@ import TextInputModal from "./components/modals/TextInputModal";
 import TextInputPreview from "./components/previews/TextInputPreview";
 import NumberInputModal from "./components/modals/NumberInputModal";
 import NumberInputPreview from "./components/previews/NumberInputPreview";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import SelectInputModal from "./components/modals/SelectInputModal";
+import SelectInputPreview from "./components/previews/SelectInputPreview";
 
 const tabs = [
   {
@@ -26,10 +25,10 @@ const tabs = [
     name: "Number Input",
     modal: NumberInputModal,
   },
-  // {
-  //   name: "Select Input",
-  //   modal: <SelectInputModal />,
-  // },
+  {
+    name: "Select Input",
+    modal: SelectInputModal,
+  },
   // {
   //   name: "Radio Input",
   //   modal: <RadioInputModal />,
@@ -53,10 +52,6 @@ export default function Home() {
     initialValues: {
       textLabel: "",
       textPlaceholder: "",
-      numberLabel: "",
-      numberPlaceholder: "",
-      minNumber: 0,
-      maxNumber: 1,
     },
     onSubmit: (values: any) => console.log(values),
   });
@@ -69,8 +64,23 @@ export default function Home() {
     },
     onSubmit: (values: any) => console.log(values),
   });
+  const formikSelect = useFormik({
+    initialValues: {
+      selectLabel: "",
+      selectPlaceholder: "",
+      options: [
+        {
+          value: "",
+          option: "",
+        },
+      ],
+    },
+    onSubmit: (values: any) => console.log(values),
+  });
 
-  const [activeModal, setActiveModal] = useState<any>(null);
+  const [activeModal, setActiveModal] = useState<any>("Text Input");
+
+  useEffect(() => {}, []);
 
   return (
     <main className="flex min-h-screen items-center justify-center px-36 py-24">
@@ -107,7 +117,10 @@ export default function Home() {
                                   : "bg-[#121212] text-[#bbb]"
                               )
                             }
-                            onClick={() => setActiveModal(tab.name)}
+                            onClick={() => {
+                              setActiveModal(tab.name);
+                            }}
+                            as="div"
                           >
                             <div className="space-y-2">
                               <p className="">{tab.name}</p>
@@ -122,6 +135,10 @@ export default function Home() {
                               case "Number Input":
                                 return (
                                   <NumberInputModal formik={formikNumber} />
+                                );
+                              case "Select Input":
+                                return (
+                                  <SelectInputModal formik={formikSelect} />
                                 );
                             }
                           })()}
@@ -140,13 +157,16 @@ export default function Home() {
                 <h3 className="w-full pb-4 bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-xl sm:text-2xl">
                   Preview
                 </h3>
-                <Tab.Panels className="w-full">
+                <Tab.Panels className="w-full mt-5">
                   <div className="h-full w-full gap-4 border rounded-xl px-6 py-4">
                     <Tab.Panel className="flex flex-col px-2 py-4">
                       <TextInputPreview formik={formik} />
                     </Tab.Panel>
                     <Tab.Panel className="flex flex-col px-2 py-4">
                       <NumberInputPreview formik={formikNumber} />
+                    </Tab.Panel>
+                    <Tab.Panel className="flex flex-col px-2 py-4">
+                      <SelectInputPreview formik={formikSelect} />
                     </Tab.Panel>
                   </div>
                 </Tab.Panels>
