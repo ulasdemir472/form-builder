@@ -53,7 +53,10 @@ export default function Home() {
       textLabel: "",
       textPlaceholder: "",
     },
-    onSubmit: (values: any) => console.log(values),
+    onSubmit: (values: any) => {
+      localStorage.setItem("textLabel", values.textLabel);
+      localStorage.setItem("textPlaceholder", values.textPlaceholder);
+    },
   });
   const formikNumber = useFormik({
     initialValues: {
@@ -62,7 +65,12 @@ export default function Home() {
       minNumber: 0,
       maxNumber: 1,
     },
-    onSubmit: (values: any) => console.log(values),
+    onSubmit: (values: any) => {
+      localStorage.setItem("numberLabel", values.numberLabel);
+      localStorage.setItem("numberPlaceholder", values.numberPlaceholder);
+      localStorage.setItem("minNumber", values.minNumber);
+      localStorage.setItem("maxNumber", values.maxNumber);
+    },
   });
   const formikSelect = useFormik({
     initialValues: {
@@ -75,12 +83,14 @@ export default function Home() {
         },
       ],
     },
-    onSubmit: (values: any) => console.log(values),
+    onSubmit: (values: any) => {
+      localStorage.setItem("selectLabel", values.selectLabel);
+      localStorage.setItem("selectPlaceholder", values.selectPlaceholder);
+      localStorage.setItem("options", JSON.stringify(values.options));
+    },
   });
 
   const [activeModal, setActiveModal] = useState<any>("Text Input");
-
-  useEffect(() => {}, []);
 
   return (
     <main className="flex min-h-screen items-center justify-center px-36 py-24">
@@ -107,26 +117,28 @@ export default function Home() {
                         className="relative group cursor-pointer space-y-3"
                       >
                         <div className="absolute -inset-1 bg-gradient-to-r from-red-600 to-violet-600 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-                        <DialogTrigger className="w-full">
-                          <Tab
-                            className={({ selected }) =>
-                              cn(
-                                "relative w-full px-2 py-4 ring-1 bg-[#121212] ring-gray-900/5 rounded-lg leading-none flex items-top justify-start",
-                                selected
-                                  ? "bg-gradient-to-r from-red-600 to-violet-600 text-white"
-                                  : "bg-[#121212] text-[#bbb]"
-                              )
-                            }
-                            onClick={() => {
-                              setActiveModal(tab.name);
-                            }}
-                            as="div"
-                          >
-                            <div className="space-y-2">
-                              <p className="">{tab.name}</p>
-                            </div>
-                          </Tab>
-                        </DialogTrigger>
+
+                        <Tab
+                          className={({ selected }) =>
+                            cn(
+                              "relative w-full px-4 py-2 ring-1 bg-[#121212] ring-gray-900/5 rounded-lg leading-none flex items-top justify-start",
+                              selected
+                                ? "bg-gradient-to-r from-red-600 to-violet-600 text-white"
+                                : "bg-[#121212] text-[#bbb]"
+                            )
+                          }
+                          onClick={() => {
+                            setActiveModal(tab.name);
+                          }}
+                          as="div"
+                        >
+                          <div className="flex justify-between w-full items-center">
+                            <p className="">{tab.name}</p>
+                            <DialogTrigger className="py-2 px-4 bg-transparent border-2 border-[#bbb]">
+                              Edit
+                            </DialogTrigger>
+                          </div>
+                        </Tab>
                         <DialogContent>
                           {(() => {
                             switch (activeModal) {
@@ -143,6 +155,24 @@ export default function Home() {
                             }
                           })()}
                           <DialogFooter>
+                            <DialogClose
+                              onClick={() => {
+                                if (activeModal === "Text Input") {
+                                  formik.handleSubmit();
+                                } else if (activeModal === "Number Input") {
+                                  formikNumber.handleSubmit();
+                                } else if (activeModal === "Select Input") {
+                                  formikSelect.handleSubmit();
+                                } else {
+                                  console.error(
+                                    "No active modal found or active modal is not a valid input type."
+                                  );
+                                }
+                              }}
+                              className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                            >
+                              Save
+                            </DialogClose>
                             <DialogClose className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
                               Cancel
                             </DialogClose>
